@@ -1,0 +1,44 @@
+name: Deploy Hugo Blog to Pages
+
+on:
+  push:
+    branches: ["main"]  # 推送main分支时自动触发部署
+  workflow_dispatch:
+
+# 权限配置，必须开启读写pages权限
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 并发限制，避免多次部署冲突
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 拉取仓库代码
+        uses: actions/checkout@v4
+        with:
+          submodules: true  # 拉取主题子模块PaperMod
+
+      - name: 安装Hugo
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: latest
+          extended: true
+
+      - name: 编译静态网站
+        run: hugo --minify
+
+      - name: 上传静态页面产物
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./public
+
+      - name: 部署到GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
