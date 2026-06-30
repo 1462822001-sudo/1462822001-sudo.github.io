@@ -1,6 +1,0 @@
-baseURL = ''
-locale = 'en-us'
-title = 'My New Hugo Project'
-theme='PaperMod'
-[params]
-BookSection = "posts"
